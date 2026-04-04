@@ -5,50 +5,51 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>Programa RFS 2026 - Control Maestro</title>
     
-    <!-- Firebase SDK -->
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
-        import { getAuth, signInAnonymously, signInWithCustomToken, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
-        import { getFirestore, doc, setDoc, onSnapshot, getDoc } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
+        import { getAuth, signInAnonymously, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
+        import { getFirestore, doc, setDoc, onSnapshot } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
+
+        // 1. Configuración Real
+        const firebaseConfig = {
+            apiKey: "AIzaSyBfZe7h1Iyiw0IMyNpceWuDhdWoem4YKOg",
+            authDomain: "programa-rfs.firebaseapp.com",
+            projectId: "programa-rfs",
+            storageBucket: "programa-rfs.firebasestorage.app",
+            messagingSenderId: "760528154663",
+            appId: "1:760528154663:web:33018fe1175fc353d95e02"
+        };
 
         // Global state
         window.appData = {};
         window.isEditing = false;
         window.currentMonth = 'Abril';
 
-        // 1. Configuración obligatoria
-        const firebaseConfig = JSON.parse(__firebase_config);
-        const appId = typeof __app_id !== 'undefined' ? __app_id : 'default-app-id';
         const app = initializeApp(firebaseConfig);
         const auth = getAuth(app);
         const db = getFirestore(app);
 
-        // 2. Ruta estricta (Regla 1)
-        const docPath = "artifacts/default-app-id/public/data/programa_2026";
-        window.docRef = doc(db, docPath, "datos");
+        // 2. Ruta Simple (Basada en tu Firestore real)
+        const docPath = "programa_rfs"; 
+        window.docRef = doc(db, docPath, "datos_2026");
 
         async function initAuth() {
             try {
-                if (typeof __initial_auth_token !== 'undefined' && __initial_auth_token) {
-                    await signInWithCustomToken(auth, __initial_auth_token);
-                } else {
-                    await signInAnonymously(auth);
-                }
+                await signInAnonymously(auth);
             } catch (e) {
                 console.error("Auth error:", e);
+                document.getElementById('status').innerText = "Error de autenticación";
             }
         }
 
         onAuthStateChanged(auth, (user) => {
             if (user) {
                 document.getElementById('status').innerHTML = '<span class="text-green-500">● EN LÍNEA</span>';
-                // Listener en tiempo real
                 onSnapshot(window.docRef, (docSnap) => {
                     if (docSnap.exists() && !window.isEditing) {
                         window.appData = docSnap.data();
                         window.renderApp();
                     } else if (!docSnap.exists()) {
-                        // Inicializar si no existe
                         window.initDefaultData();
                     }
                 }, (err) => {
@@ -76,10 +77,8 @@
         .theme-Octubre { --accent: #ec4899; }
         .theme-Noviembre { --accent: #14b8a6; }
         .theme-Diciembre { --accent: #475569; }
-        
         .accent-text { color: var(--accent); }
         .accent-bg { background-color: var(--accent); }
-        
         .modal { display: none; }
         .modal.active { display: flex; }
     </style>
@@ -122,7 +121,6 @@
         </div>
     </div>
 
-    <!-- Modal Presidente -->
     <div id="modal-presidente" class="modal fixed inset-0 bg-black/50 backdrop-blur-sm z-50 items-center justify-center p-4">
         <div class="bg-white w-full max-w-md rounded-3xl overflow-hidden shadow-2xl animate-in zoom-in duration-200">
             <div class="accent-bg p-6 text-white">
@@ -142,47 +140,30 @@
         const months = ['Abril', 'Mayo', 'Junio', 'Julio', 'Agosto', 'Septiembre', 'Octubre', 'Noviembre', 'Diciembre'];
 
         window.initDefaultData = async function() {
-    const months = ['Abril', 'Mayo', 'Junio', 'Julio', 'Agosto', 'Septiembre', 'Octubre', 'Noviembre', 'Diciembre'];
-    let initialData = {};
+            let initialData = {};
+            months.forEach((m, idx) => {
+                initialData[m] = [];
+                let date = new Date(2026, idx + 3, 1);
+                while (date.getMonth() === (idx + 3)) {
+                    if (date.getDay() === 6 || date.getDay() === 0) { 
+                        initialData[m].push({ 
+                            d: String(date.getDate()).padStart(2, '0'), p: '', o: '', t: '', c: '', l: '', s: '', sd: '', h: '18:30' 
+                        });
+                    }
+                    date.setDate(date.getDate() + 1);
+                }
+            });
 
-    months.forEach((m, idx) => {
-        initialData[m] = [];
-        let date = new Date(2026, idx + 3, 1);
-        while (date.getMonth() === (idx + 3)) {
-            if (date.getDay() === 6 || date.getDay() === 0) { // Sábados y Domingos
-                initialData[m].push({ 
-                    d: date.getDate(), p: '', o: '', t: '', c: '', l: '', s: '', sd: '', h: '18:30' 
-                });
-            }
-            date.setDate(date.getDate() + 1);
-        }
-    });
-
-    try {
-        // Importante: Usar setDoc con el objeto local creado
-        const { setDoc } = await import("https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js");
-        await setDoc(window.docRef, initialData);
-        window.appData = initialData;
-        window.renderApp();
-    } catch(e) { 
-        console.error("Error al inicializar datos:", e); 
-    }
-};
-
-    try {
-        // Importante: Usar setDoc con el objeto local creado
-        const { setDoc } = await import("https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js");
-        await setDoc(window.docRef, initialData);
-        window.appData = initialData;
-        window.renderApp();
-    } catch(e) { 
-        console.error("Error al inicializar datos:", e); 
-    }
-};
+            try {
+                const { setDoc } = await import("https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js");
+                await setDoc(window.docRef, initialData);
+                window.appData = initialData;
+                window.renderApp();
+            } catch(e) { console.error("Error al inicializar datos:", e); }
+        };
 
         window.renderApp = function() {
             document.getElementById('theme-root').className = `p-2 md:p-6 theme-${window.currentMonth}`;
-            
             const tabs = document.getElementById('month-tabs');
             tabs.innerHTML = months.map(m => `
                 <button onclick="setMonth('${m}')" class="px-4 py-2 rounded-xl text-xs font-bold uppercase whitespace-nowrap transition-all ${window.currentMonth === m ? 'accent-bg text-white shadow-lg' : 'bg-white text-slate-400 hover:bg-slate-50'}">${m}</button>
@@ -221,7 +202,6 @@
                     </td>
                 </tr>
             `).join('') || '';
-            
             lucide.createIcons();
         };
 
@@ -251,16 +231,11 @@
 
         window.openModal = (idx) => {
             const row = window.appData[window.currentMonth][idx];
-            // Buscar tema siguiente
             let nextTheme = "No asignado";
             const nextIdx = idx + 1;
             if (window.appData[window.currentMonth][nextIdx]) {
                 nextTheme = window.appData[window.currentMonth][nextIdx].t || "Sin tema";
-            } else {
-                const nextMonth = months[months.indexOf(window.currentMonth) + 1];
-                if (nextMonth && window.appData[nextMonth][0]) nextTheme = window.appData[nextMonth][0].t || "Sin tema";
             }
-
             document.getElementById('modal-content').innerHTML = `
                 <div class="bg-slate-50 p-4 rounded-2xl border border-slate-100">
                     <span class="text-[10px] font-black uppercase text-slate-400 block mb-1">Presidente asignado</span>
@@ -271,13 +246,6 @@
                     <div class="p-4 bg-indigo-50 border-l-4 border-indigo-500 rounded-r-2xl">
                         <p class="font-bold text-slate-800 mb-1">${row.t || 'Sin tema'}</p>
                         <p class="text-xs font-black accent-text uppercase">${row.o || 'Orador pendiente'}</p>
-                        <p class="text-[10px] text-slate-400 mt-1 uppercase font-bold">${row.c || 'Local'}</p>
-                    </div>
-                </div>
-                <div class="pt-4 border-t border-dashed">
-                    <span class="text-[10px] font-black uppercase text-slate-400 block mb-2">Próximo Discurso Público:</span>
-                    <div class="p-3 bg-slate-900 text-white rounded-xl text-xs italic font-medium">
-                        "${nextTheme}"
                     </div>
                 </div>
             `;
