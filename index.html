@@ -141,21 +141,44 @@
     <script>
         const months = ['Abril', 'Mayo', 'Junio', 'Julio', 'Agosto', 'Septiembre', 'Octubre', 'Noviembre', 'Diciembre'];
 
-        window.initDefaultData = function() {
-            months.forEach((m, idx) => {
-                window.appData[m] = [];
-                let date = new Date(2026, idx + 3, 1);
-                while (date.getMonth() === (idx + 3)) {
-                    if (date.getDay() === 6 || date.getDay() === 0) { // Sáb y Dom
-                        if (date.getDay() === 6) {
-                            window.appData[m].push({ d: date.getDate(), p: '', o: '', t: '', c: '', l: '', s: '', sd: '', h: '18:30' });
-                        }
-                    }
-                    date.setDate(date.getDate() + 1);
-                }
-            });
-            window.renderApp();
-        };
+        window.initDefaultData = async function() {
+    const months = ['Abril', 'Mayo', 'Junio', 'Julio', 'Agosto', 'Septiembre', 'Octubre', 'Noviembre', 'Diciembre'];
+    let initialData = {};
+
+    months.forEach((m, idx) => {
+        initialData[m] = [];
+        let date = new Date(2026, idx + 3, 1);
+        while (date.getMonth() === (idx + 3)) {
+            if (date.getDay() === 6 || date.getDay() === 0) { // Sábados y Domingos
+                initialData[m].push({ 
+                    d: date.getDate(), p: '', o: '', t: '', c: '', l: '', s: '', sd: '', h: '18:30' 
+                });
+            }
+            date.setDate(date.getDate() + 1);
+        }
+    });
+
+    try {
+        // Importante: Usar setDoc con el objeto local creado
+        const { setDoc } = await import("https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js");
+        await setDoc(window.docRef, initialData);
+        window.appData = initialData;
+        window.renderApp();
+    } catch(e) { 
+        console.error("Error al inicializar datos:", e); 
+    }
+};
+
+    try {
+        // Importante: Usar setDoc con el objeto local creado
+        const { setDoc } = await import("https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js");
+        await setDoc(window.docRef, initialData);
+        window.appData = initialData;
+        window.renderApp();
+    } catch(e) { 
+        console.error("Error al inicializar datos:", e); 
+    }
+};
 
         window.renderApp = function() {
             document.getElementById('theme-root').className = `p-2 md:p-6 theme-${window.currentMonth}`;
