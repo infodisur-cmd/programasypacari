@@ -47,38 +47,70 @@
     
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;600;800&display=swap');
-        body { font-family: 'Plus Jakarta Sans', sans-serif; background: #f8fafc; color: #1e293b; }
-        .tab-active { background: white; color: #4338ca; box-shadow: 0 4px 6px -1px rgb(0 0 0 / 0.1); }
-        input { background: transparent; width: 100%; outline: none; border-bottom: 1px solid #e2e8f0; }
-        input:focus { border-bottom-color: #4338ca; }
-        @media print { .no-print { display: none; } }
+        body { font-family: 'Plus Jakarta Sans', sans-serif; background: #f8fafc; color: #1e293b; transition: background 0.3s; }
+        
+        /* Paleta de colores por mes */
+        .theme-Abril { --accent: #4338ca; --accent-bg: #e0e7ff; } /* Índigo */
+        .theme-Mayo { --accent: #047857; --accent-bg: #d1fae5; } /* Esmeralda */
+        .theme-Junio { --accent: #b45309; --accent-bg: #fef3c7; } /* Ámbar */
+        .theme-Julio { --accent: #db2777; --accent-bg: #fce7f3; } /* Rosa */
+        .theme-Agosto { --accent: #ca8a04; --accent-bg: #fef9c3; } /* Amarillo */
+        .theme-Septiembre { --accent: #0369a1; --accent-bg: #e0f2fe; } /* Celeste */
+        .theme-Octubre { --accent: #9333ea; --accent-bg: #f3e8ff; } /* Púrpura */
+        .theme-Noviembre { --accent: #c2410c; --accent-bg: #ffedd5; } /* Naranja */
+        .theme-Diciembre { --accent: #475569; --accent-bg: #f1f5f9; } /* Slate */
+
+        .accent-text { color: var(--accent); }
+        .accent-bg { background-color: var(--accent); }
+        .accent-light-bg { background-color: var(--accent-bg); }
+        .accent-border { border-color: var(--accent); }
+
+        .tab-active { background: white; color: var(--accent); box-shadow: 0 4px 6px -1px rgb(0 0 0 / 0.1); }
+        input { background: transparent; width: 100%; outline: none; border-bottom: 1px solid #e2e8f0; text-overflow: ellipsis; }
+        input:focus { border-bottom-color: var(--accent); }
+
+        /* Estilos de Impresión */
+        @media print {
+            body { background: white; p: 0; }
+            .no-print { display: none !important; }
+            .print-area { box-shadow: none; border: none; width: 100%; max-width: 100%; p: 0; m: 0; }
+            table { font-size: 11px; width: 100% !important; table-layout: fixed; }
+            th, td { padding: 8px !important; border-bottom: 1px solid #e2e8f0 !important; }
+            .text-4xl { font-size: 24px; }
+            .text-sm { font-size: 10px; }
+        }
     </style>
 </head>
-<body class="p-4 md:p-8">
+<body class="p-4 md:p-8" id="theme-root">
 
-    <div class="max-w-6xl mx-auto bg-white rounded-[2rem] shadow-sm border border-slate-100 overflow-hidden">
-        <header class="p-8 border-b border-slate-50">
+    <div class="max-w-6xl mx-auto bg-white rounded-[2rem] shadow-sm border border-slate-100 overflow-hidden print-area">
+        <header class="p-8 border-b border-slate-50 accent-light-bg transition-colors">
             <div class="flex justify-between items-start">
                 <div>
-                    <h1 class="text-4xl font-extrabold italic text-slate-800 tracking-tight">PROGRAMA <span class="text-indigo-600">2026</span></h1>
-                    <p class="text-slate-500 font-semibold mt-1">Reunión fin de semana – Ypacaraí español</p>
-                    <p id="status" class="text-[10px] font-bold text-green-500 mt-2">CONECTANDO...</p>
+                    <h1 class="text-4xl font-extrabold italic text-slate-800 tracking-tight">PROGRAMA <span class="accent-text transition-colors">2026</span></h1>
+                    <p class="text-slate-500 font-semibold mt-1 text-sm">Reunión fin de semana – Ypacaraí español</p>
+                    <p id="status" class="text-[10px] font-bold text-green-500 mt-2 no-print">CONECTANDO...</p>
                 </div>
-                <button id="edit-btn" onclick="toggleEdit()" class="no-print px-6 py-2 bg-slate-900 text-white rounded-xl font-bold text-sm">EDITAR</button>
+                <div class="flex gap-2 no-print">
+                    <button onclick="window.print()" class="p-3 bg-white border border-slate-100 rounded-xl text-slate-400 hover:text-slate-800 transition-colors">
+                        <i data-lucide="printer" class="w-5 h-5"></i>
+                    </button>
+                    <button id="edit-btn" onclick="toggleEdit()" class="px-6 py-2 bg-slate-900 text-white rounded-xl font-bold text-sm">EDITAR</button>
+                </div>
             </div>
         </header>
 
-        <nav id="month-tabs" class="no-print flex gap-2 p-4 bg-slate-50/50 overflow-x-auto"></nav>
+        <nav id="month-tabs" class="no-print flex gap-2 p-4 bg-slate-50/50 overflow-x-auto border-b border-slate-100"></nav>
 
         <div class="overflow-x-auto">
             <table class="w-full text-left border-collapse">
                 <thead>
-                    <tr class="text-[11px] font-black uppercase text-slate-400 tracking-widest border-b border-slate-100">
-                        <th class="p-6 text-center">Fecha</th>
+                    <tr class="text-[11px] font-black uppercase text-slate-400 tracking-widest border-b border-slate-100 bg-slate-50/50">
+                        <th class="p-6 text-center w-24">Fecha</th>
                         <th class="p-6">Presidente</th>
                         <th class="p-6">Discurso Local</th>
                         <th class="p-6">Lector</th>
-                        <th class="p-6">Salida Oradores</th>
+                        <th class="p-6 w-[240px]">Salida Oradores</th>
                     </tr>
                 </thead>
                 <tbody id="table-body"></tbody>
@@ -86,15 +118,15 @@
         </div>
     </div>
 
-    <div id="modal" class="hidden fixed inset-0 bg-slate-900/60 backdrop-blur-sm z-50 items-center justify-center p-4">
-        <div class="bg-white w-full max-w-md rounded-[2.5rem] overflow-hidden shadow-2xl">
+    <div id="modal" class="hidden fixed inset-0 bg-slate-900/60 backdrop-blur-sm z-50 items-center justify-center p-4 no-print">
+        <div class="bg-white w-full max-w-md rounded-[2.5rem] overflow-hidden shadow-2xl animate-in zoom-in duration-150">
             <div class="p-8">
                 <div class="flex justify-between items-center mb-6">
                     <h2 class="text-xl font-black italic uppercase">Recordatorio</h2>
-                    <button onclick="closeModal()" class="p-2 bg-slate-100 rounded-full"><i data-lucide="x" class="w-5 h-5"></i></button>
+                    <button onclick="closeModal()" class="p-2 bg-slate-100 rounded-full hover:bg-slate-200"><i data-lucide="x" class="w-5 h-5"></i></button>
                 </div>
-                <div id="modal-text" class="bg-slate-50 p-6 rounded-2xl font-medium text-slate-700 whitespace-pre-wrap text-sm leading-relaxed border border-slate-100"></div>
-                <button onclick="copyText()" class="w-full mt-6 py-4 bg-indigo-600 text-white font-bold rounded-2xl shadow-lg shadow-indigo-200 flex items-center justify-center gap-2">
+                <div id="modal-text" class="bg-slate-50 p-6 rounded-2xl font-medium text-slate-700 whitespace-pre-wrap text-sm leading-relaxed border border-slate-100 accent-border border-l-4"></div>
+                <button onclick="copyText()" class="w-full mt-6 py-4 accent-bg text-white font-bold rounded-2xl shadow-lg shadow-indigo-200 flex items-center justify-center gap-2 hover:opacity-90 transition-opacity">
                     <i data-lucide="copy" class="w-5 h-5"></i> COPIAR PARA WHATSAPP
                 </button>
             </div>
@@ -124,73 +156,99 @@
         window.setMonth = (m) => { window.currentMonth = m; window.renderApp(); };
 
         window.renderApp = function() {
+            // Aplicar tema del mes
+            document.getElementById('theme-root').className = `p-4 md:p-8 theme-${window.currentMonth}`;
+
+            // Render Tabs
             const tabs = document.getElementById('month-tabs');
             tabs.innerHTML = months.map(m => `
-                <button onclick="setMonth('${m}')" class="px-5 py-2 rounded-xl text-xs font-bold uppercase transition-all ${window.currentMonth === m ? 'tab-active' : 'text-slate-400'}">${m}</button>
+                <button onclick="setMonth('${m}')" class="px-5 py-2 rounded-xl text-xs font-bold uppercase transition-all ${window.currentMonth === m ? 'tab-active' : 'text-slate-400 hover:text-slate-600'}">${m}</button>
             `).join('');
 
+            // Render Tabla
             const body = document.getElementById('table-body');
             body.innerHTML = window.appData[window.currentMonth]?.map((row, i) => `
-                <tr class="border-b border-slate-50 group hover:bg-slate-50/50 transition-colors">
-                    <td class="p-6 text-center border-r border-slate-50">
-                        <div class="text-2xl font-black text-slate-800 leading-none">${row.d}</div>
-                        <div class="text-[10px] font-bold text-slate-400 uppercase mt-1">${window.currentMonth}</div>
+                <tr class="border-b border-slate-50 hover:bg-slate-50/50 transition-colors">
+                    <td class="p-6 text-center border-r border-slate-50 align-top">
+                        <div class="text-2xl font-black text-slate-800 leading-none accent-text">${row.d}</div>
+                        <div class="text-[10px] font-bold text-slate-400 uppercase mt-1 tracking-wider">${window.currentMonth}</div>
+                        <button onclick="openLocalModal(${i})" class="mt-5 p-2 bg-white border border-slate-100 rounded-lg text-slate-300 hover:accent-text hover:border-indigo-100 transition-colors no-print"><i data-lucide="bell" class="w-4 h-4"></i></button>
                     </td>
-                    <td class="p-6">
+                    <td class="p-6 align-top">
                         <div class="flex items-center gap-3">
                             <i data-lucide="user" class="w-4 h-4 text-slate-300"></i>
                             ${window.isEditing ? `<input list="hermanos" value="${row.p}" onchange="updateVal(${i}, 'p', this.value)">` : `<span class="font-bold text-slate-700 uppercase text-sm">${row.p || '-'}</span>`}
                         </div>
-                        <button onclick="openLocalModal(${i})" class="mt-4 p-2 text-slate-300 hover:text-indigo-600 transition-colors no-print"><i data-lucide="bell" class="w-4 h-4"></i></button>
                     </td>
-                    <td class="p-6">
-                        <div class="space-y-3">
-                            <div class="flex items-center gap-2">
+                    <td class="p-6 align-top">
+                        <div class="space-y-3.5">
+                            <div class="flex items-center gap-3">
                                 <i data-lucide="users" class="w-4 h-4 text-slate-300"></i>
                                 ${window.isEditing ? `<input list="hermanos" value="${row.o}" onchange="updateVal(${i}, 'o', this.value)">` : `<span class="font-bold text-slate-800 uppercase text-sm">${row.o || '-'}</span>`}
                             </div>
-                            <div class="flex items-center gap-2">
-                                <i data-lucide="book-open" class="w-4 h-4 text-slate-300"></i>
-                                ${window.isEditing ? `<input value="${row.t}" placeholder="Tema..." onchange="updateVal(${i}, 't', this.value)">` : `<span class="text-xs italic text-slate-500">${row.t || '-'}</span>`}
+                            <div class="flex items-start gap-3">
+                                <i data-lucide="book-open" class="w-4 h-4 text-slate-300 mt-0.5"></i>
+                                ${window.isEditing ? `<input value="${row.t}" placeholder="Tema Discurso Local..." onchange="updateVal(${i}, 't', this.value)">` : `<span class="text-xs italic text-slate-500 leading-relaxed">${row.t || '-'}</span>`}
                             </div>
-                            <div class="flex items-center gap-2">
+                            <div class="flex items-center gap-3">
                                 <i data-lucide="map-pin" class="w-4 h-4 text-slate-300"></i>
-                                ${window.isEditing ? `<input value="${row.c}" onchange="updateVal(${i}, 'c', this.value)">` : `<span class="text-[10px] font-bold text-slate-400 uppercase">${row.c || 'YPACARAÍ'}</span>`}
+                                ${window.isEditing ? `<input value="${row.c}" onchange="updateVal(${i}, 'c', this.value)">` : `<span class="text-[10px] font-black text-slate-400 uppercase tracking-wider">${row.c || 'YPACARAÍ'}</span>`}
                             </div>
                         </div>
                     </td>
-                    <td class="p-6">
-                        <div class="flex items-center gap-2">
+                    <td class="p-6 align-top">
+                        <div class="flex items-center gap-3">
                             <i data-lucide="user-check" class="w-4 h-4 text-slate-300"></i>
                             ${window.isEditing ? `<input list="hermanos" value="${row.l}" onchange="updateVal(${i}, 'l', this.value)">` : `<span class="font-bold text-slate-700 uppercase text-sm">${row.l || '-'}</span>`}
                         </div>
                     </td>
-                    <td class="p-6">
-                        <div class="space-y-3">
-                            <div class="flex items-center gap-2">
-                                <i data-lucide="user" class="w-4 h-4 text-slate-300"></i>
+                    <td class="p-6 align-top border-l border-slate-50 relative">
+                        <div class="space-y-3.5">
+                            <div class="flex items-center gap-3">
+                                <i data-lucide="plane-takeoff" class="w-4 h-4 text-slate-300"></i>
                                 ${window.isEditing ? `<input list="hermanos" value="${row.s}" onchange="updateVal(${i}, 's', this.value)">` : `<span class="font-bold text-slate-800 uppercase text-sm">${row.s || '-'}</span>`}
                             </div>
-                            <div class="flex items-center gap-2">
-                                <i data-lucide="book-open" class="w-4 h-4 text-slate-300"></i>
-                                ${window.isEditing ? `<input value="${row.st}" placeholder="Tema..." onchange="updateVal(${i}, 'st', this.value)">` : `<span class="text-xs italic text-slate-500">${row.st || '-'}</span>`}
+                            <div class="flex items-start gap-3">
+                                <i data-lucide="book-open" class="w-4 h-4 text-slate-300 mt-0.5"></i>
+                                ${window.isEditing ? `<input value="${row.st}" placeholder="Tema Discurso Salida..." onchange="updateVal(${i}, 'st', this.value)">` : `<span class="text-xs italic text-slate-500 leading-relaxed">${row.st || '-'}</span>`}
                             </div>
-                            <div class="pt-2 border-t border-slate-100">
-                                <div class="text-[9px] font-black text-slate-400 uppercase tracking-tighter mb-1">CONGREGACIÓN</div>
-                                ${window.isEditing ? `<input value="${row.sd}" onchange="updateVal(${i}, 'sd', this.value)">` : `<div class="flex justify-between items-center"><span class="font-bold text-slate-800 text-xs uppercase">${row.sd || '-'}</span> <span class="text-[10px] font-bold text-indigo-600">SÁBADO</span></div>`}
+                            <div class="pt-3 border-t border-slate-100 mt-2">
+                                <div class="text-[9px] font-black text-slate-400 uppercase tracking-tighter mb-1.5">CONGREGACIÓN</div>
+                                ${window.isEditing ? `<input value="${row.sd}" placeholder="Destino..." onchange="updateVal(${i}, 'sd', this.value)">` : `<div class="flex justify-between items-center"><span class="font-bold text-slate-800 text-xs uppercase">${row.sd || '-'}</span> <span class="text-[10px] font-bold accent-text">SÁBADO</span></div>`}
                             </div>
                         </div>
-                        <button onclick="openSalidaModal(${i})" class="mt-2 p-2 text-slate-300 hover:text-indigo-600 transition-colors no-print"><i data-lucide="bell-ring" class="w-4 h-4"></i></button>
+                        <button onclick="openSalidaModal(${i})" class="absolute bottom-4 right-4 p-2 text-slate-300 hover:accent-text transition-colors no-print"><i data-lucide="bell-ring" class="w-4 h-4"></i></button>
                     </td>
                 </tr>
             `).join('') || '';
             lucide.createIcons();
         };
 
-        // RECORDATORIO LOCAL
+        // RECORDATORIO LOCAL (Con conexión inteligente de temas)
         window.openLocalModal = (idx) => {
-            const row = window.appData[window.currentMonth][idx];
-            const nextRow = window.appData[window.currentMonth][idx+1] || { t: 'Pendiente' };
+            const currentMonthData = window.appData[window.currentMonth];
+            const row = currentMonthData[idx];
+            
+            let nextTheme = "Pendiente asignar";
+
+            // Lógica avanzada para buscar el siguiente tema
+            if (idx + 1 < currentMonthData.length) {
+                // Hay otra semana en el mismo mes
+                nextTheme = currentMonthData[idx+1].t || "Sin tema asignado";
+            } else {
+                // Es la última semana del mes, buscar en el siguiente mes
+                const currentMonthIndex = months.indexOf(window.currentMonth);
+                const nextMonthName = months[currentMonthIndex + 1];
+
+                if (nextMonthName && window.appData[nextMonthName] && window.appData[nextMonthName][0]) {
+                    // Existe el siguiente mes y tiene datos
+                    nextTheme = window.appData[nextMonthName][0].t || "Sin tema asignado";
+                } else if (nextMonthName) {
+                    nextTheme = `Pendiente asignar (${nextMonthName})`;
+                } else {
+                    nextTheme = "Fin del programa anual";
+                }
+            }
             
             const text = `*RECORDATORIO REUNIÓN FIN DE SEMANA* 🗓️
 *Fecha:* ${row.d} de ${window.currentMonth}
@@ -200,10 +258,10 @@
 *Tema:* _"${row.t || '-'}"_
 *Lector de la Atalaya:* ${row.l || '-'}
 
-📌 *Próximo Discurso Público:* _"${nextRow.t || '-'}"_`;
+📌 *Próximo Discurso Público:* _"${nextTheme}"_`;
 
             document.getElementById('modal-text').innerText = text;
-            document.getElementById('modal').classList.add('active', 'flex');
+            document.getElementById('modal').classList.add('flex');
             document.getElementById('modal').classList.remove('hidden');
         };
 
@@ -218,11 +276,15 @@
 *Congregación:* ${row.sd || '-'}`;
 
             document.getElementById('modal-text').innerText = text;
-            document.getElementById('modal').classList.add('active', 'flex');
+            document.getElementById('modal').classList.add('flex');
+            document.getElementById('modal-text').classList.add('accent-border');
             document.getElementById('modal').classList.remove('hidden');
         };
 
-        window.closeModal = () => document.getElementById('modal').classList.add('hidden');
+        window.closeModal = () => {
+            document.getElementById('modal').classList.add('hidden');
+            document.getElementById('modal-text').classList.remove('accent-border');
+        };
         
         window.copyText = () => {
             const text = document.getElementById('modal-text').innerText;
