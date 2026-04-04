@@ -5,55 +5,60 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>Programa RFS 2026 - Control Maestro</title>
     
-    <!-- Firebase SDK -->
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
-        import { getAuth, signInAnonymously, signInWithCustomToken, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
-        import { getFirestore, doc, setDoc, onSnapshot, getDoc } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
+        import { getAuth, signInAnonymously, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
+        import { getFirestore, doc, setDoc, onSnapshot } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
+
+        // 1. Configuración Real (Tus datos)
+        const firebaseConfig = {
+            apiKey: "AIzaSyBfZe7h1Iyiw0IMyNpceWuDhdWoem4YKOg",
+            authDomain: "programa-rfs.firebaseapp.com",
+            projectId: "programa-rfs",
+            storageBucket: "programa-rfs.firebasestorage.app",
+            messagingSenderId: "760528154663",
+            appId: "1:760528154663:web:33018fe1175fc353d95e02"
+        };
 
         // Global state
         window.appData = {};
         window.isEditing = false;
         window.currentMonth = 'Abril';
 
-        // 1. Configuración obligatoria
-        const firebaseConfig = JSON.parse(__firebase_config);
-        const appId = typeof __app_id !== 'undefined' ? __app_id : 'default-app-id';
         const app = initializeApp(firebaseConfig);
         const auth = getAuth(app);
         const db = getFirestore(app);
 
-        // 2. Ruta estricta (Regla 1)
-        const docPath = `artifacts/${appId}/public/data/programa_2026`;
+        // 2. Ruta simplificada para tu proyecto
+        const docPath = "config/programa_2026";
         window.docRef = doc(db, docPath, "datos");
 
         async function initAuth() {
             try {
-                if (typeof __initial_auth_token !== 'undefined' && __initial_auth_token) {
-                    await signInWithCustomToken(auth, __initial_auth_token);
-                } else {
-                    await signInAnonymously(auth);
-                }
+                // En GitHub Pages usamos login anónimo por defecto
+                await signInAnonymously(auth);
             } catch (e) {
                 console.error("Auth error:", e);
+                document.getElementById('status').innerText = "Error de Autenticación";
             }
         }
 
         onAuthStateChanged(auth, (user) => {
             if (user) {
-                document.getElementById('status').innerHTML = '<span class="text-green-500">● EN LÍNEA</span>';
+                document.getElementById('status').innerHTML = '<span class="text-green-500 font-bold">● EN LÍNEA</span>';
+                
                 // Listener en tiempo real
                 onSnapshot(window.docRef, (docSnap) => {
                     if (docSnap.exists() && !window.isEditing) {
                         window.appData = docSnap.data();
                         window.renderApp();
                     } else if (!docSnap.exists()) {
-                        // Inicializar si no existe
+                        // Si la base de datos está vacía, crear estructura inicial
                         window.initDefaultData();
                     }
                 }, (err) => {
                     console.error("Firestore error:", err);
-                    document.getElementById('status').innerText = "Error de conexión";
+                    document.getElementById('status').innerHTML = '<span class="text-red-500">Error de Permisos (Check Rules)</span>';
                 });
             }
         });
@@ -122,9 +127,8 @@
         </div>
     </div>
 
-    <!-- Modal Presidente -->
     <div id="modal-presidente" class="modal fixed inset-0 bg-black/50 backdrop-blur-sm z-50 items-center justify-center p-4">
-        <div class="bg-white w-full max-w-md rounded-3xl overflow-hidden shadow-2xl animate-in zoom-in duration-200">
+        <div class="bg-white w-full max-w-md rounded-3xl overflow-hidden shadow-2xl">
             <div class="accent-bg p-6 text-white">
                 <div class="flex justify-between items-center">
                     <h2 class="text-xl font-black uppercase italic">Datos para el presidente</h2>
@@ -141,19 +145,29 @@
     <script>
         const months = ['Abril', 'Mayo', 'Junio', 'Julio', 'Agosto', 'Septiembre', 'Octubre', 'Noviembre', 'Diciembre'];
 
-        window.initDefaultData = function() {
+        window.initDefaultData = async function() {
             months.forEach((m, idx) => {
                 window.appData[m] = [];
+                // Ajuste para el año 2026 y meses correctos (Abril es mes 3)
                 let date = new Date(2026, idx + 3, 1);
                 while (date.getMonth() === (idx + 3)) {
-                    if (date.getDay() === 6 || date.getDay() === 0) { // Sáb y Dom
-                        if (date.getDay() === 6) {
-                            window.appData[m].push({ d: date.getDate(), p: '', o: '', t: '', c: '', l: '', s: '', sd: '', h: '18:30' });
-                        }
+                    // Solo agregamos Sábados (6) o Domingos (0) según tu preferencia
+                    // Aquí agrego solo los Sábados de 2026 como ejemplo inicial
+                    if (date.getDay() === 6) { 
+                        window.appData[m].push({ 
+                            d: date.getDate(), p: '', o: '', t: '', c: '', l: '', s: '', sd: '', h: '18:30' 
+                        });
                     }
                     date.setDate(date.getDate() + 1);
                 }
             });
+            
+            // Guardar estructura inicial en Firebase
+            try {
+                const { setDoc } = await import("https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js");
+                await setDoc(window.docRef, window.appData);
+            } catch(e) { console.log("Error inicializando:", e); }
+            
             window.renderApp();
         };
 
@@ -197,7 +211,7 @@
                         </div>
                     </td>
                 </tr>
-            `).join('') || '';
+            `).join('') || '<tr><td colspan="5" class="p-10 text-center text-slate-400">Cargando datos...</td></tr>';
             
             lucide.createIcons();
         };
@@ -214,7 +228,7 @@
 
         window.toggleEdit = () => {
             if(!window.isEditing) {
-                if(prompt("Clave:") === "2026") {
+                if(prompt("Clave de edición:") === "2026") {
                     window.isEditing = true;
                     document.getElementById('edit-btn').innerHTML = '<i data-lucide="check" class="w-4 h-4"></i> LISTO';
                     window.renderApp();
@@ -228,14 +242,10 @@
 
         window.openModal = (idx) => {
             const row = window.appData[window.currentMonth][idx];
-            // Buscar tema siguiente
             let nextTheme = "No asignado";
             const nextIdx = idx + 1;
             if (window.appData[window.currentMonth][nextIdx]) {
                 nextTheme = window.appData[window.currentMonth][nextIdx].t || "Sin tema";
-            } else {
-                const nextMonth = months[months.indexOf(window.currentMonth) + 1];
-                if (nextMonth && window.appData[nextMonth][0]) nextTheme = window.appData[nextMonth][0].t || "Sin tema";
             }
 
             document.getElementById('modal-content').innerHTML = `
@@ -248,13 +258,6 @@
                     <div class="p-4 bg-indigo-50 border-l-4 border-indigo-500 rounded-r-2xl">
                         <p class="font-bold text-slate-800 mb-1">${row.t || 'Sin tema'}</p>
                         <p class="text-xs font-black accent-text uppercase">${row.o || 'Orador pendiente'}</p>
-                        <p class="text-[10px] text-slate-400 mt-1 uppercase font-bold">${row.c || 'Local'}</p>
-                    </div>
-                </div>
-                <div class="pt-4 border-t border-dashed">
-                    <span class="text-[10px] font-black uppercase text-slate-400 block mb-2">Próximo Discurso Público:</span>
-                    <div class="p-3 bg-slate-900 text-white rounded-xl text-xs italic font-medium">
-                        "${nextTheme}"
                     </div>
                 </div>
             `;
