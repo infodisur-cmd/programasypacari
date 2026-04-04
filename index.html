@@ -1,0 +1,268 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Programa RFS 2026 - Control Maestro</title>
+    
+    <!-- Firebase SDK -->
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
+        import { getAuth, signInAnonymously, signInWithCustomToken, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
+        import { getFirestore, doc, setDoc, onSnapshot, getDoc } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
+
+        // Global state
+        window.appData = {};
+        window.isEditing = false;
+        window.currentMonth = 'Abril';
+
+        // 1. Configuración obligatoria
+        const firebaseConfig = JSON.parse(__firebase_config);
+        const appId = typeof __app_id !== 'undefined' ? __app_id : 'default-app-id';
+        const app = initializeApp(firebaseConfig);
+        const auth = getAuth(app);
+        const db = getFirestore(app);
+
+        // 2. Ruta estricta (Regla 1)
+        const docPath = `artifacts/${appId}/public/data/programa_2026`;
+        window.docRef = doc(db, docPath, "datos");
+
+        async function initAuth() {
+            try {
+                if (typeof __initial_auth_token !== 'undefined' && __initial_auth_token) {
+                    await signInWithCustomToken(auth, __initial_auth_token);
+                } else {
+                    await signInAnonymously(auth);
+                }
+            } catch (e) {
+                console.error("Auth error:", e);
+            }
+        }
+
+        onAuthStateChanged(auth, (user) => {
+            if (user) {
+                document.getElementById('status').innerHTML = '<span class="text-green-500">● EN LÍNEA</span>';
+                // Listener en tiempo real
+                onSnapshot(window.docRef, (docSnap) => {
+                    if (docSnap.exists() && !window.isEditing) {
+                        window.appData = docSnap.data();
+                        window.renderApp();
+                    } else if (!docSnap.exists()) {
+                        // Inicializar si no existe
+                        window.initDefaultData();
+                    }
+                }, (err) => {
+                    console.error("Firestore error:", err);
+                    document.getElementById('status').innerText = "Error de conexión";
+                });
+            }
+        });
+
+        initAuth();
+    </script>
+    
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://unpkg.com/lucide@latest"></script>
+    
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;600;800&display=swap');
+        body { font-family: 'Inter', sans-serif; background: #f1f5f9; }
+        .theme-Abril { --accent: #6366f1; }
+        .theme-Mayo { --accent: #10b981; }
+        .theme-Junio { --accent: #f59e0b; }
+        .theme-Julio { --accent: #8b5cf6; }
+        .theme-Agosto { --accent: #ef4444; }
+        .theme-Septiembre { --accent: #0ea5e9; }
+        .theme-Octubre { --accent: #ec4899; }
+        .theme-Noviembre { --accent: #14b8a6; }
+        .theme-Diciembre { --accent: #475569; }
+        
+        .accent-text { color: var(--accent); }
+        .accent-bg { background-color: var(--accent); }
+        
+        .modal { display: none; }
+        .modal.active { display: flex; }
+    </style>
+</head>
+<body class="p-2 md:p-6" id="theme-root">
+
+    <datalist id="hermanos">
+        <option value="Abel Benitez"><option value="Adrian Terrones"><option value="Amancio Candia"><option value="Claudio Bauer"><option value="Damián Rizzi"><option value="Daniel Díaz"><option value="José Benítez"><option value="Luis Cáceres"><option value="Carlos Barreto"><option value="Christian González"><option value="Santiago Barreto"><option value="Thiago Torres"><option value="Fernando Rizzi"><option value="Diego Rizzi"><option value="Osvaldo Díaz"><option value="José Godoy">
+    </datalist>
+
+    <div class="max-w-6xl mx-auto">
+        <header class="bg-white rounded-2xl p-6 mb-6 shadow-sm flex flex-col md:flex-row justify-between items-center gap-4">
+            <div>
+                <h1 class="text-3xl font-black italic uppercase text-slate-800">Programa <span class="accent-text">2026</span></h1>
+                <p class="text-slate-500 font-semibold uppercase text-[10px] tracking-widest" id="status">Conectando...</p>
+            </div>
+            <div class="flex gap-2">
+                <button onclick="window.print()" class="p-2 bg-slate-100 rounded-lg hover:bg-slate-200 transition-colors"><i data-lucide="printer" class="w-5 h-5"></i></button>
+                <button id="edit-btn" onclick="toggleEdit()" class="px-4 py-2 bg-slate-800 text-white rounded-lg font-bold text-xs flex items-center gap-2">
+                    <i data-lucide="pencil" class="w-4 h-4"></i> EDITAR
+                </button>
+            </div>
+        </header>
+
+        <nav id="month-tabs" class="flex gap-1 mb-6 overflow-x-auto pb-2"></nav>
+
+        <div class="bg-white rounded-2xl shadow-xl overflow-hidden border border-slate-200">
+            <table class="w-full text-left text-sm">
+                <thead class="bg-slate-50 border-b text-[10px] font-black uppercase text-slate-400">
+                    <tr>
+                        <th class="p-4 text-center">Fecha</th>
+                        <th class="p-4">Presidente</th>
+                        <th class="p-4">Discurso Público</th>
+                        <th class="p-4">Atalaya</th>
+                        <th class="p-4">Salidas</th>
+                    </tr>
+                </thead>
+                <tbody id="table-body"></tbody>
+            </table>
+        </div>
+    </div>
+
+    <!-- Modal Presidente -->
+    <div id="modal-presidente" class="modal fixed inset-0 bg-black/50 backdrop-blur-sm z-50 items-center justify-center p-4">
+        <div class="bg-white w-full max-w-md rounded-3xl overflow-hidden shadow-2xl animate-in zoom-in duration-200">
+            <div class="accent-bg p-6 text-white">
+                <div class="flex justify-between items-center">
+                    <h2 class="text-xl font-black uppercase italic">Datos para el presidente</h2>
+                    <button onclick="closeModal()"><i data-lucide="x" class="w-6 h-6"></i></button>
+                </div>
+            </div>
+            <div id="modal-content" class="p-8 space-y-6"></div>
+            <div class="p-4 bg-slate-50 border-t flex justify-end">
+                <button onclick="closeModal()" class="px-6 py-2 accent-bg text-white font-bold rounded-xl shadow-lg">CERRAR</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const months = ['Abril', 'Mayo', 'Junio', 'Julio', 'Agosto', 'Septiembre', 'Octubre', 'Noviembre', 'Diciembre'];
+
+        window.initDefaultData = function() {
+            months.forEach((m, idx) => {
+                window.appData[m] = [];
+                let date = new Date(2026, idx + 3, 1);
+                while (date.getMonth() === (idx + 3)) {
+                    if (date.getDay() === 6 || date.getDay() === 0) { // Sáb y Dom
+                        if (date.getDay() === 6) {
+                            window.appData[m].push({ d: date.getDate(), p: '', o: '', t: '', c: '', l: '', s: '', sd: '', h: '18:30' });
+                        }
+                    }
+                    date.setDate(date.getDate() + 1);
+                }
+            });
+            window.renderApp();
+        };
+
+        window.renderApp = function() {
+            document.getElementById('theme-root').className = `p-2 md:p-6 theme-${window.currentMonth}`;
+            
+            const tabs = document.getElementById('month-tabs');
+            tabs.innerHTML = months.map(m => `
+                <button onclick="setMonth('${m}')" class="px-4 py-2 rounded-xl text-xs font-bold uppercase whitespace-nowrap transition-all ${window.currentMonth === m ? 'accent-bg text-white shadow-lg' : 'bg-white text-slate-400 hover:bg-slate-50'}">${m}</button>
+            `).join('');
+
+            const body = document.getElementById('table-body');
+            body.innerHTML = window.appData[window.currentMonth]?.map((row, i) => `
+                <tr class="border-b border-slate-100 hover:bg-slate-50 transition-colors">
+                    <td class="p-4 text-center border-r">
+                        <div class="text-xl font-black text-slate-800 leading-none">${row.d}</div>
+                        <div class="text-[9px] font-bold text-slate-400 uppercase mt-1">${window.currentMonth.slice(0,3)}</div>
+                        <button onclick="openModal(${i})" class="mt-3 text-slate-300 hover:accent-text transition-colors"><i data-lucide="bell" class="w-4 h-4"></i></button>
+                    </td>
+                    <td class="p-4">
+                        ${window.isEditing ? `<input list="hermanos" class="w-full p-2 border rounded text-xs font-bold" value="${row.p}" onchange="updateVal(${i}, 'p', this.value)">` : `<div class="font-bold text-xs uppercase">${row.p || '-'}</div>`}
+                    </td>
+                    <td class="p-4">
+                        <div class="space-y-1">
+                            ${window.isEditing ? `
+                                <input list="hermanos" class="w-full p-1 border rounded text-xs" value="${row.o}" placeholder="Orador" onchange="updateVal(${i}, 'o', this.value)">
+                                <input class="w-full p-1 border rounded text-[10px] italic" value="${row.t}" placeholder="Tema" onchange="updateVal(${i}, 't', this.value)">
+                            ` : `
+                                <div class="font-black text-slate-800 uppercase">${row.o || '-'}</div>
+                                <div class="text-[11px] italic text-slate-500">${row.t || 'Sin tema asignado'}</div>
+                            `}
+                        </div>
+                    </td>
+                    <td class="p-4">
+                        ${window.isEditing ? `<input list="hermanos" class="w-full p-2 border rounded text-xs" value="${row.l}" onchange="updateVal(${i}, 'l', this.value)">` : `<div class="font-bold text-slate-700 text-xs">${row.l || '-'}</div>`}
+                    </td>
+                    <td class="p-4">
+                        <div class="bg-slate-50 p-2 rounded-lg border text-[10px]">
+                             ${window.isEditing ? `<input list="hermanos" class="w-full p-1 mb-1 border rounded" value="${row.s}" onchange="updateVal(${i}, 's', this.value)">` : `<div class="font-bold accent-text mb-1">${row.s || '-'}</div>`}
+                             <div class="opacity-60">${row.sd || 'Destino pendiente'}</div>
+                        </div>
+                    </td>
+                </tr>
+            `).join('') || '';
+            
+            lucide.createIcons();
+        };
+
+        window.setMonth = (m) => { window.currentMonth = m; window.renderApp(); };
+
+        window.updateVal = async (idx, field, val) => {
+            window.appData[window.currentMonth][idx][field] = val;
+            try {
+                const { setDoc } = await import("https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js");
+                await setDoc(window.docRef, window.appData);
+            } catch(e) { console.error("Save error:", e); }
+        };
+
+        window.toggleEdit = () => {
+            if(!window.isEditing) {
+                if(prompt("Clave:") === "2026") {
+                    window.isEditing = true;
+                    document.getElementById('edit-btn').innerHTML = '<i data-lucide="check" class="w-4 h-4"></i> LISTO';
+                    window.renderApp();
+                }
+            } else {
+                window.isEditing = false;
+                document.getElementById('edit-btn').innerHTML = '<i data-lucide="pencil" class="w-4 h-4"></i> EDITAR';
+                window.renderApp();
+            }
+        };
+
+        window.openModal = (idx) => {
+            const row = window.appData[window.currentMonth][idx];
+            // Buscar tema siguiente
+            let nextTheme = "No asignado";
+            const nextIdx = idx + 1;
+            if (window.appData[window.currentMonth][nextIdx]) {
+                nextTheme = window.appData[window.currentMonth][nextIdx].t || "Sin tema";
+            } else {
+                const nextMonth = months[months.indexOf(window.currentMonth) + 1];
+                if (nextMonth && window.appData[nextMonth][0]) nextTheme = window.appData[nextMonth][0].t || "Sin tema";
+            }
+
+            document.getElementById('modal-content').innerHTML = `
+                <div class="bg-slate-50 p-4 rounded-2xl border border-slate-100">
+                    <span class="text-[10px] font-black uppercase text-slate-400 block mb-1">Presidente asignado</span>
+                    <p class="text-xl font-black text-slate-800">${row.p || 'Sin asignar'}</p>
+                </div>
+                <div class="space-y-2">
+                    <span class="text-[10px] font-black uppercase text-slate-400 block">Detalles del Discurso</span>
+                    <div class="p-4 bg-indigo-50 border-l-4 border-indigo-500 rounded-r-2xl">
+                        <p class="font-bold text-slate-800 mb-1">${row.t || 'Sin tema'}</p>
+                        <p class="text-xs font-black accent-text uppercase">${row.o || 'Orador pendiente'}</p>
+                        <p class="text-[10px] text-slate-400 mt-1 uppercase font-bold">${row.c || 'Local'}</p>
+                    </div>
+                </div>
+                <div class="pt-4 border-t border-dashed">
+                    <span class="text-[10px] font-black uppercase text-slate-400 block mb-2">Próximo Discurso Público:</span>
+                    <div class="p-3 bg-slate-900 text-white rounded-xl text-xs italic font-medium">
+                        "${nextTheme}"
+                    </div>
+                </div>
+            `;
+            document.getElementById('modal-presidente').classList.add('active');
+            lucide.createIcons();
+        };
+
+        window.closeModal = () => document.getElementById('modal-presidente').classList.remove('active');
+    </script>
+</body>
+</html>
