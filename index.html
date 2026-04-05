@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>Programa RFS 2026 - Control Maestro</title>
-    
+
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
         import { getAuth, signInAnonymously, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
@@ -26,14 +26,11 @@
         const app = initializeApp(firebaseConfig);
         const auth = getAuth(app);
         const db = getFirestore(app);
-        
-        // RUTA CORREGIDA según tu captura de Firebase
         window.docRef = doc(db, "programa_rfs", "datos_2026");
 
         onAuthStateChanged(auth, (user) => {
             if (user) {
-                const statusEl = document.getElementById('status');
-                if(statusEl) statusEl.innerHTML = '● EN LÍNEA';
+                document.getElementById('status').innerHTML = '● EN LÍNEA';
                 onSnapshot(window.docRef, (docSnap) => {
                     if (docSnap.exists() && !window.isEditing) {
                         window.appData = docSnap.data();
@@ -44,14 +41,15 @@
         });
         signInAnonymously(auth);
     </script>
-    
+
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://unpkg.com/lucide@latest"></script>
-    
+
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;600;800&display=swap');
-        body { font-family: 'Plus Jakarta Sans', sans-serif; background: #f1f5f9; color: #1e293b; }
-        
+        body { font-family: 'Plus Jakarta Sans', sans-serif; background: #f1f5f9; color: #1e293b; -webkit-tap-highlight-color: transparent; }
+
+        /* Temas Dinámicos */
         .theme-Abril { --accent: #4338ca; --accent-light: #e0e7ff; }
         .theme-Mayo { --accent: #047857; --accent-light: #d1fae5; }
         .theme-Junio { --accent: #b45309; --accent-light: #fef3c7; }
@@ -60,137 +58,157 @@
         .theme-Septiembre { --accent: #0369a1; --accent-light: #e0f2fe; }
         .theme-Octubre { --accent: #9333ea; --accent-light: #f3e8ff; }
         .theme-Noviembre { --accent: #c2410c; --accent-light: #ffedd5; }
-        .theme-Diciembre { --accent: #1e4883; --accent-light: #9ac9f8; }
+        .theme-Diciembre { --accent: #475569; --accent-light: #f1f5f9; }
 
         .accent-text { color: var(--accent); }
         .accent-bg { background-color: var(--accent); }
         .accent-light-bg { background-color: var(--accent-light); }
-        
-        input, select { background: transparent; border-bottom: 1px solid #e2e8f0; width: 100%; outline: none; font-size: 0.8rem; }
+        .icon-themed { color: var(--accent); }
 
+        /* Estilos de Input */
+        input, select { 
+            background: transparent; 
+            border-bottom: 1px solid #e2e8f0; 
+            width: 100%; 
+            outline: none; 
+            font-size: 0.8rem;
+            padding: 2px 0;
+        }
+        input:focus { border-bottom-color: var(--accent); }
+
+        /* Tablet & Mobile Optimization */
         @media (max-width: 1024px) {
-            .table-container { overflow-x: auto; }
+            .table-container { overflow-x: auto; -webkit-overflow-scrolling: touch; }
             table { min-width: 900px; }
+            .p-5 { padding: 1rem !important; }
         }
 
         @media print {
-            @page { size: letter landscape; margin: 0.3cm; }
+            @page { size: landscape; margin: 0.5cm; }
             .no-print { display: none !important; }
-            body { background: white; padding: 0 !important; }
-            .print-container { box-shadow: none !important; border: none !important; width: 100% !important; margin: 0 !important; }
-            table { table-layout: fixed; width: 100% !important; border-collapse: collapse; }
-            th, td { padding: 4px !important; border: 0.5px solid #e2e8f0 !important; font-size: 9px !important; line-height: 1.1; }
-            .text-3xl { font-size: 1.4rem !important; }
-            header { padding: 10px !important; margin-bottom: 5px !important; }
+            body { background: white; padding: 0; }
+            .print-container { box-shadow: none; border: none; width: 100%; max-width: 100%; }
         }
     </style>
 </head>
 <body class="p-2 md:p-6" id="theme-root">
 
-    <div class="max-w-[1440px] mx-auto bg-white rounded-[1.5rem] shadow-xl border border-slate-200 overflow-hidden print-container">
+    <div class="max-w-[1440px] mx-auto bg-white rounded-[1.5rem] md:rounded-[2.5rem] shadow-xl border border-slate-200 overflow-hidden print-container">
         <header class="p-6 md:p-10 accent-light-bg transition-colors">
-            <div class="flex flex-col md:flex-row justify-between items-center gap-4">
+            <div class="flex flex-col md:flex-row justify-between items-center gap-4 text-center md:text-left">
                 <div>
-                    <h1 class="text-3xl md:text-5xl font-extrabold italic text-slate-800">PROGRAMA <span class="accent-text">2026</span></h1>
-                    <p class="text-slate-500 font-bold text-xs uppercase tracking-widest">Reunión Fin de Semana – Ypacaraí Español</p>
-                    <div id="status" class="inline-block mt-2 px-3 py-1 bg-white rounded-full text-[9px] font-black text-green-500 shadow-sm uppercase">Conectando...</div>
+                    <h1 class="text-3xl md:text-5xl font-extrabold italic text-slate-800 tracking-tighter">PROGRAMA DEL FIN DE SEMANA <span class="accent-text">2026</span></h1>
+                    <p class="text-slate-500 font-bold text-xs md:text-sm mt-1 uppercase tracking-widest">Reunión Fin de Semana – Ypacaraí</p>
+                    <h1 class="text-3xl md:text-5xl font-extrabold italic text-slate-800 tracking-tighter">PROGRAMA <span class="accent-text">2026</span></h1>
+                    <p class="text-slate-500 font-bold text-xs md:text-sm mt-1 uppercase tracking-widest">Reunión Fin de Semana – Ypacaraí Español</p>
+                    <div id="status" class="inline-block mt-2 px-3 py-1 bg-white rounded-full text-[9px] font-black text-green-500 shadow-sm uppercase tracking-tighter">Conectando...</div>
                 </div>
                 <div class="flex gap-2 no-print">
-                    <button onclick="window.print()" class="p-3 bg-white rounded-xl border border-slate-200"><i data-lucide="printer" class="w-5 h-5 text-slate-400"></i></button>
-                    <button id="edit-btn" onclick="toggleEdit()" class="px-8 py-3 bg-slate-900 text-white rounded-xl font-black text-sm">EDITAR</button>
-                </div>
-            </div>
-        </header>
-
-        <nav id="month-tabs" class="no-print flex gap-1 p-4 bg-slate-50 border-b overflow-x-auto"></nav>
-
-        <div class="table-container">
-            <table class="w-full text-left">
-                <thead>
-                    <tr class="text-[10px] font-black uppercase text-slate-400 bg-slate-50/80">
-                        <th class="p-4 text-center w-20">Fecha</th>
-                        <th class="p-4">Presidente</th>
-                        <th class="p-4">Discurso Público</th>
-                        <th class="p-4">Lector Atalaya</th>
-                        <th class="p-4">Salidas</th>
-                    </tr>
-                </thead>
-                <tbody id="table-body"></tbody>
-            </table>
-        </div>
-    </div>
-
-    <datalist id="hermanos">
-        <option value="Abel Benitez">
-        <option value="Adrián Terrones">
-        <option value="Amancio Candia">
-        <option value="Carlos Barreto">
-        <option value="Christian González">
-        <option value="Claudio Bauer">
-        <option value="Damián Rizzi">
-        <option value="Daniel Díaz">
-        <option value="Diego Rizzi">
-        <option value="Fernando Rizzi">
-        <option value="José Benítez">
-        <option value="José Godoy">
-        <option value="Luis Cáceres">
-        <option value="Martin Bauer">
-        <option value="Mike Bauer">
-        <option value="Osvaldo Diaz">
-        <option value="Ricardo Lugo">
-        <option value="Santiago Barreto">
-        <option value="Thiago Torres">
-        <option value="Víctor Rizzi (Padre)">
-    </datalist>
-
-    <script>
-        const months = ['Abril', 'Mayo', 'Junio', 'Julio', 'Agosto', 'Septiembre', 'Octubre', 'Noviembre', 'Diciembre'];
-        
-        window.toggleEdit = () => {
-            if(!window.isEditing) {
-                if(prompt("Clave:") === "2026") { window.isEditing = true; window.renderApp(); }
-            } else { window.isEditing = false; window.renderApp(); }
-            document.getElementById('edit-btn').innerText = window.isEditing ? 'LISTO' : 'EDITAR';
-        };
-
-        window.updateVal = async (idx, field, val) => {
-            window.appData[window.currentMonth][idx][field] = val;
-            const { setDoc } = await import("https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js");
-            await setDoc(window.docRef, window.appData);
-        };
-
-        window.setMonth = (m) => { window.currentMonth = m; window.renderApp(); };
-
-        window.renderApp = function() {
-            document.getElementById('theme-root').className = `p-2 md:p-6 theme-${window.currentMonth}`;
-            const tabs = document.getElementById('month-tabs');
-            tabs.innerHTML = months.map(m => `<button onclick="setMonth('${m}')" class="px-4 py-2 rounded-lg text-[10px] font-black uppercase whitespace-nowrap ${window.currentMonth === m ? 'bg-white shadow-sm accent-text' : 'text-slate-400'}">${m}</button>`).join('');
-
-            const body = document.getElementById('table-body');
-            body.innerHTML = (window.appData[window.currentMonth] || []).map((row, i) => `
-                <tr class="border-b border-slate-50">
-                    <td class="p-4 text-center border-r">
-                        <div class="text-3xl font-black accent-text">${row.d || '00'}</div>
-                        <div class="text-[8px] font-bold text-slate-400 uppercase">${window.currentMonth}</div>
+@@ -216,106 +216,106 @@
+                        <div class="space-y-4">
+                            <div>
+                                <div class="flex items-center gap-2 mb-1 text-slate-300">
+                                    <i data-lucide="users" class="w-4 h-4 icon-themed"></i>
+                                    <i data-lucide="user" class="w-4 h-4 icon-themed"></i>
+                                    <span class="text-[9px] font-black uppercase">Orador Visitante</span>
+                                </div>
+                                ${window.isEditing ? `<input value="${row.o || ''}" onchange="updateVal(${i}, 'o', this.value)">` : `<div class="font-bold text-sm text-slate-800 uppercase">${row.o || '-'}</div>`}
+                            </div>
+                            <div>
+                                <div class="flex items-center gap-2 mb-1 text-slate-300">
+                                    <i data-lucide="book-open" class="w-4 h-4 icon-themed"></i>
+                                    <span class="text-[9px] font-black uppercase">Tema</span>
+                                </div>
+                                ${window.isEditing ? `<input value="${row.t || ''}" placeholder="Título del discurso..." onchange="updateVal(${i}, 't', this.value)">` : `<div class="text-[11px] font-medium text-slate-500 italic leading-snug">"${row.t || '-'}"</div>`}
+                            </div>
+                            <div>
+                                <div class="flex items-center gap-2 mb-1 text-slate-300">
+                                    <i data-lucide="map-pin" class="w-4 h-4 icon-themed"></i>
+                                    <span class="text-[9px] font-black uppercase">Congregación que visita</span>
+                                </div>
+                                ${window.isEditing ? `<input value="${row.cv || ''}" onchange="updateVal(${i}, 'cv', this.value)">` : `<div class="text-[10px] font-black text-slate-400 uppercase tracking-tighter">${row.cv || '-'}</div>`}
+                            </div>
+                        </div>
                     </td>
-                    <td class="p-4">
-                        ${window.isEditing ? `<input list="hermanos" value="${row.p || ''}" onchange="updateVal(${i}, 'p', this.value)">` : `<div class="font-bold text-sm uppercase">${row.p || '-'}</div>`}
+
+                    <td class="p-5 align-top">
+                        <div class="flex items-center gap-2 mb-2">
+                            <i data-lucide="user-check" class="w-4 h-4 icon-themed"></i>
+                            <span class="text-[9px] font-black text-slate-300 uppercase">Lector Atalaya</span>
+                        </div>
+                        ${window.isEditing ? `<input list="hermanos" value="${row.l || ''}" onchange="updateVal(${i}, 'l', this.value)">` : `<div class="font-bold text-sm uppercase text-slate-700">${row.l || '-'}</div>`}
                     </td>
-                    <td class="p-4 bg-slate-50/30">
-                        <div class="text-xs font-bold">${window.isEditing ? `<input value="${row.o || ''}" onchange="updateVal(${i}, 'o', this.value)">` : (row.o || '-')}</div>
-                        <div class="text-[10px] italic text-slate-500">${window.isEditing ? `<input value="${row.t || ''}" onchange="updateVal(${i}, 't', this.value)">` : (row.t || '-')}</div>
+
+                    <td class="p-5 align-top border-l border-slate-100">
+                        <div class="space-y-4">
+                            <div>
+                                <div class="flex items-center gap-2 mb-1 text-slate-300">
+                                    <i data-lucide="plane-takeoff" class="w-4 h-4 icon-themed"></i>
+                                    <span class="text-[9px] font-black uppercase">Orador de Salida</span>
+                                </div>
+                                ${window.isEditing ? `<input list="hermanos" value="${row.s || ''}" onchange="updateVal(${i}, 's', this.value)">` : `<div class="font-bold text-sm text-slate-800 uppercase">${row.s || '-'}</div>`}
+                            </div>
+                            <div>
+                                <div class="flex items-center gap-2 mb-1 text-slate-300">
+                                    <i data-lucide="book-open" class="w-4 h-4 icon-themed"></i>
+                                    <span class="text-[9px] font-black uppercase">Tema</span>
+                                </div>
+                                ${window.isEditing ? `<input value="${row.st || ''}" placeholder="Tema de salida..." onchange="updateVal(${i}, 'st', this.value)">` : `<div class="text-[11px] font-medium text-slate-500 italic">"${row.st || '-'}"</div>`}
+                            </div>
+                            
+                            <div class="pt-3 border-t border-slate-100">
+                                <div class="flex justify-between items-center mb-2">
+                                    <div class="flex items-center gap-1">
+                                        <span class="text-[8px] font-black text-slate-300 uppercase">Congregación</span>
+                                        <button onclick="openSalidaModal(${i})" class="ml-1 p-1 text-slate-300 hover:accent-text no-print"><i data-lucide="bell-ring" class="w-3 h-3"></i></button>
+                                    </div>
+                                    <div class="text-[8px] font-black text-slate-300 uppercase">Día / Hora</div>
+                                </div>
+                                <div class="flex gap-2">
+                                    <div class="flex-1">${window.isEditing ? `<input value="${row.sd || ''}" onchange="updateVal(${i}, 'sd', this.value)">` : `<div class="font-bold text-[11px] uppercase">${row.sd || '-'}</div>`}</div>
+                                    <div class="w-20">${window.isEditing ? `<select onchange="updateVal(${i}, 'shd', this.value)"><option value="Sábado" ${row.shd=='Sábado'?'selected':''}>Sábado</option><option value="Domingo" ${row.shd=='Domingo'?'selected':''}>Domingo</option></select>` : `<div class="text-[10px] font-black accent-text uppercase">${row.shd || '-'}</div>`}</div>
+                                    <div class="w-16">${window.isEditing ? `<input type="time" value="${row.shh || ''}" onchange="updateVal(${i}, 'shh', this.value)">` : `<div class="text-[10px] font-black text-slate-400 uppercase">${row.shh || '-'}</div>`}</div>
+                                </div>
+                            </div>
+                        </div>
                     </td>
-                    <td class="p-4">
-                        ${window.isEditing ? `<input list="hermanos" value="${row.l || ''}" onchange="updateVal(${i}, 'l', this.value)">` : `<div class="font-bold text-sm uppercase">${row.l || '-'}</div>`}
-                    </td>
-                    <td class="p-4 border-l">
-                         <div class="text-[10px] font-bold accent-text">${window.isEditing ? `<input list="hermanos" value="${row.s || ''}" onchange="updateVal(${i}, 's', this.value)">` : (row.s || '-')}</div>
-                         <div class="text-[9px] opacity-60">${window.isEditing ? `<input value="${row.sd || ''}" onchange="updateVal(${i}, 'sd', this.value)">` : (row.sd || '-')}</div>
-                    </td>
+                    `}
                 </tr>
-            `).join('');
+                `;
+            }).join('') || '<tr><td colspan="5" class="p-10 text-center text-slate-400 font-bold uppercase italic tracking-widest">No hay datos para este mes</td></tr>';
             lucide.createIcons();
         };
+
+        // LÓGICA DE RECORDATORIOS
+        window.openLocalModal = (idx) => {
+            const currentMonthData = window.appData[window.currentMonth] || [];
+            const row = currentMonthData[idx];
+            let nextTheme = "Pendiente asignar";
+
+            // Buscar tema de la próxima semana
+            if (idx + 1 < currentMonthData.length) {
+                nextTheme = currentMonthData[idx + 1].t || "Pendiente asignar";
+            } else {
+                const currentIdx = months.indexOf(window.currentMonth);
+                const nextMonthName = months[currentIdx + 1];
+                if (nextMonthName && window.appData[nextMonthName] && window.appData[nextMonthName][0]) {
+                    nextTheme = window.appData[nextMonthName][0].t || "Pendiente asignar";
+                }
+            }
+
+            const text = `*RECORDATORIO REUNIÓN FIN DE SEMANA* 🗓️\nFecha: ${row.d} de ${window.currentMonth}\n\n*Presidente:* ${row.p || '-'}\n*Discursante:* ${row.o || '-'}\n*Tema:* _"${row.t || '-'}"_\n*Lector de la Atalaya:* ${row.l || '-'}\n\n📌 *Próximo Discurso Público:* _"${nextTheme}"_`;
+            showModal(text);
+        };
+
+        window.openSalidaModal = (idx) => {
+            const row = window.appData[window.currentMonth][idx];
+            const text = `*SALIDA DE ORADOR* 🚗\n*Fecha:* ${row.d} de ${window.currentMonth}\n\n*Orador:* ${row.s || '-'}\n*Tema:* _"${row.st || '-'}"_\n*Congregación:* ${row.sd || '-'}\n*Previsto:* ${row.shd || ''} - ${row.shh || ''}hs`;
+            showModal(text);
+        };
+
+        const showModal = (t) => { document.getElementById('modal-text').innerText = t; document.getElementById('modal').classList.replace('hidden', 'flex'); };
+        window.closeModal = () => document.getElementById('modal').classList.replace('flex', 'hidden');
+        window.copyText = () => { navigator.clipboard.writeText(document.getElementById('modal-text').innerText); alert("¡Copiado para WhatsApp!"); };
     </script>
 </body>
 </html>
