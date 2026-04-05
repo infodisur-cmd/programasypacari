@@ -85,14 +85,28 @@
         header { padding: 1.5rem !important; }
     }
 
-@media print {
-@media print {
+/* REGLA DE IMPRESIÓN CORREGIDA (Letter Landscape - 1 Sola Hoja) */
+    @media print {
         @page { size: letter landscape; margin: 0.3cm; }
         body { background: white; padding: 0 !important; margin: 0 !important; }
         .no-print, #status, #edit-btn, nav { display: none !important; }
         .print-container { box-shadow: none !important; border: none !important; width: 100% !important; max-width: 100% !important; margin: 0 !important; }
-        }
-    </style>
+        
+        /* Ajuste de celdas para que quepa todo el mes */
+        table { table-layout: fixed; width: 100% !important; border-spacing: 0; border-collapse: collapse; }
+        th { padding: 4px !important; font-size: 9px !important; background: #f8fafc !important; -webkit-print-color-adjust: exact; }
+        td { padding: 5px 4px !important; border: 0.5px solid #e2e8f0 !important; vertical-align: top !important; line-height: 1.1 !important; }
+        
+        /* Ajuste de tamaños de texto para impresión */
+        .text-3xl { font-size: 1.5rem !important; } /* Fecha */
+        .text-sm { font-size: 10px !important; }
+        .text-\[11px\], .text-\[10px\] { font-size: 9px !important; }
+        .font-black.accent-text { font-size: 18px !important; }
+        
+        header { padding: 10px 20px !important; margin-bottom: 5px !important; }
+        .p-5 { padding: 4px !important; }
+        .space-y-4 > * + * { margin-top: 0.2rem !important; }
+    }
 </head>
 <body class="p-2 md:p-6" id="theme-root">
 
