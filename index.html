@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>Programa RFS 2026 - Control Maestro</title>
-
+    
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
         import { getAuth, signInAnonymously, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
@@ -41,14 +41,14 @@
         });
         signInAnonymously(auth);
     </script>
-
+    
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://unpkg.com/lucide@latest"></script>
-
+    
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;600;800&display=swap');
         body { font-family: 'Plus Jakarta Sans', sans-serif; background: #f1f5f9; color: #1e293b; -webkit-tap-highlight-color: transparent; }
-
+        
         /* Temas Dinámicos */
         .theme-Abril { --accent: #4338ca; --accent-light: #e0e7ff; }
         .theme-Mayo { --accent: #047857; --accent-light: #d1fae5; }
@@ -58,7 +58,7 @@
         .theme-Septiembre { --accent: #0369a1; --accent-light: #e0f2fe; }
         .theme-Octubre { --accent: #9333ea; --accent-light: #f3e8ff; }
         .theme-Noviembre { --accent: #c2410c; --accent-light: #ffedd5; }
-        .theme-Diciembre { --accent: #475569; --accent-light: #f1f5f9; }
+        .theme-Diciembre { --accent: #396fbb; --accent-light: #7fa7cf; }
 
         .accent-text { color: var(--accent); }
         .accent-bg { background-color: var(--accent); }
@@ -79,7 +79,7 @@
         /* Tablet & Mobile Optimization */
         @media (max-width: 1024px) {
             .table-container { overflow-x: auto; -webkit-overflow-scrolling: touch; }
-            table { min-width: 900px; }
+            table { min-width: 1000px; }
             .p-5 { padding: 1rem !important; }
         }
 
@@ -97,18 +97,125 @@
         <header class="p-6 md:p-10 accent-light-bg transition-colors">
             <div class="flex flex-col md:flex-row justify-between items-center gap-4 text-center md:text-left">
                 <div>
-                    <h1 class="text-3xl md:text-5xl font-extrabold italic text-slate-800 tracking-tighter">PROGRAMA DEL FIN DE SEMANA <span class="accent-text">2026</span></h1>
-                    <p class="text-slate-500 font-bold text-xs md:text-sm mt-1 uppercase tracking-widest">Reunión Fin de Semana – Ypacaraí</p>
                     <h1 class="text-3xl md:text-5xl font-extrabold italic text-slate-800 tracking-tighter">PROGRAMA <span class="accent-text">2026</span></h1>
-                    <p class="text-slate-500 font-bold text-xs md:text-sm mt-1 uppercase tracking-widest">Reunión Fin de Semana – Ypacaraí Español</p>
+                    <p class="text-slate-500 font-bold text-xs md:text-sm mt-1 uppercase tracking-widest">Reunión Fin de Semana – Ypacaraí</p>
                     <div id="status" class="inline-block mt-2 px-3 py-1 bg-white rounded-full text-[9px] font-black text-green-500 shadow-sm uppercase tracking-tighter">Conectando...</div>
                 </div>
                 <div class="flex gap-2 no-print">
-@@ -216,106 +216,106 @@
+                    <button onclick="window.print()" class="p-3 bg-white rounded-2xl border border-slate-200 shadow-sm hover:bg-slate-50 transition-all"><i data-lucide="printer" class="w-5 h-5 text-slate-400"></i></button>
+                    <button id="edit-btn" onclick="toggleEdit()" class="px-8 py-3 bg-slate-900 text-white rounded-2xl font-black text-sm hover:scale-105 active:scale-95 transition-all shadow-lg">EDITAR</button>
+                </div>
+            </div>
+        </header>
+
+        <nav id="month-tabs" class="no-print flex gap-1 p-4 bg-slate-50 border-b border-slate-100 overflow-x-auto scrollbar-hide"></nav>
+
+        <div class="table-container">
+            <table class="w-full text-left border-collapse">
+                <thead>
+                    <tr class="text-[10px] md:text-[11px] font-black uppercase text-slate-400 bg-slate-50/80 border-b border-slate-100">
+                        <th class="p-5 text-center w-24">Fecha</th>
+                        <th class="p-5">Presidente</th>
+                        <th class="p-5">Discurso Público (Visita)</th>
+                        <th class="p-5">Lector</th>
+                        <th class="p-5 w-80">Salida de Oradores</th>
+                    </tr>
+                </thead>
+                <tbody id="table-body"></tbody>
+            </table>
+        </div>
+    </div>
+
+    <div id="modal" class="hidden fixed inset-0 bg-slate-900/80 backdrop-blur-md z-50 items-center justify-center p-4 no-print">
+        <div class="bg-white w-full max-w-md rounded-[2.5rem] p-8 shadow-2xl animate-in zoom-in duration-200">
+            <div class="flex justify-between items-center mb-6">
+                <h2 class="text-xl font-black italic uppercase tracking-tighter accent-text">Recordatorio WhatsApp</h2>
+                <button onclick="closeModal()" class="p-2 bg-slate-100 rounded-full hover:bg-slate-200"><i data-lucide="x" class="w-5 h-5"></i></button>
+            </div>
+            <div id="modal-text" class="bg-slate-50 p-6 rounded-3xl text-sm font-medium text-slate-700 whitespace-pre-wrap leading-relaxed border border-slate-100 italic border-l-8 accent-border"></div>
+            <button onclick="copyText()" class="w-full mt-6 py-5 accent-bg text-white font-black rounded-2xl shadow-xl hover:opacity-90 transition-all flex items-center justify-center gap-2">
+                <i data-lucide="copy" class="w-5 h-5"></i> COPIAR MENSAJE
+            </button>
+        </div>
+    </div>
+
+  <datalist id="hermanos">
+        <option value="Abel Benitez">
+        <option value="Adrián Terrones">
+        <option value="Amancio Candia">
+        <option value="Carlos Barreto">
+        <option value="Christian González">
+        <option value="Claudio Bauer">
+        <option value="Damián Rizzi">
+        <option value="Daniel Díaz">
+        <option value="Diego Rizzi">
+        <option value="Fernando Rizzi">
+        <option value="José Benítez">
+        <option value="José Godoy">
+        <option value="Luis Cáceres">
+        <option value="Martin Bauer">
+        <option value="Mike Bauer">
+        <option value="Osvaldo Diaz">
+        <option value="Ricardo Lugo">
+        <option value="Santiago Barreto">
+        <option value="Thiago Torres">
+        <option value="Víctor Rizzi (Padre)">
+    </datalist>
+
+    <script>
+        const months = ['Abril', 'Mayo', 'Junio', 'Julio', 'Agosto', 'Septiembre', 'Octubre', 'Noviembre', 'Diciembre'];
+        
+        window.toggleEdit = () => {
+            if(!window.isEditing) {
+                if(prompt("Clave de acceso:") === "2026") { window.isEditing = true; window.renderApp(); }
+            } else { window.isEditing = false; window.renderApp(); }
+            document.getElementById('edit-btn').innerText = window.isEditing ? 'LISTO' : 'EDITAR';
+        };
+
+        window.updateVal = async (idx, field, val) => {
+            if (!window.appData[window.currentMonth]) window.appData[window.currentMonth] = [];
+            if (!window.appData[window.currentMonth][idx]) window.appData[window.currentMonth][idx] = {};
+            
+            window.appData[window.currentMonth][idx][field] = val;
+            const { setDoc } = await import("https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js");
+            await setDoc(window.docRef, window.appData);
+        };
+
+        window.setMonth = (m) => { window.currentMonth = m; window.renderApp(); };
+
+        window.renderApp = function() {
+            document.getElementById('theme-root').className = `p-2 md:p-6 theme-${window.currentMonth}`;
+            const tabs = document.getElementById('month-tabs');
+            tabs.innerHTML = months.map(m => `<button onclick="setMonth('${m}')" class="px-6 py-2 rounded-xl text-[10px] font-black uppercase whitespace-nowrap transition-all ${window.currentMonth === m ? 'bg-white shadow-md accent-text scale-105' : 'text-slate-400 hover:text-slate-600'}">${m}</button>`).join('');
+
+            const body = document.getElementById('table-body');
+            body.innerHTML = (window.appData[window.currentMonth] || []).map((row, i) => {
+                const isSpecial = row.ev && row.ev.trim() !== "";
+                return `
+                <tr class="border-b border-slate-50 hover:bg-slate-50/50 transition-colors">
+                    <td class="p-5 text-center border-r border-slate-100 align-top">
+                        <div class="text-3xl font-black accent-text leading-none">${row.d || '00'}</div>
+                        <div class="text-[9px] font-bold text-slate-400 uppercase tracking-tighter mt-1">${window.currentMonth}</div>
+                        <button onclick="openLocalModal(${i})" class="mt-4 p-2 bg-white border border-slate-200 rounded-xl text-slate-300 hover:accent-text hover:border-indigo-100 shadow-sm transition-all no-print"><i data-lucide="bell" class="w-4 h-4"></i></button>
+                        ${window.isEditing ? `<input class="mt-2 text-[8px] text-center" placeholder="Evento Especial?" value="${row.ev || ''}" onchange="updateVal(${i}, 'ev', this.value)">` : ''}
+                    </td>
+
+                    ${isSpecial ? `
+                    <td colspan="4" class="p-10 text-center bg-slate-50/30">
+                        <div class="text-[28px] font-black italic uppercase accent-text tracking-[0.2em] opacity-80">${row.ev}</div>
+                    </td>` : `
+                    <td class="p-5 align-top">
+                        <div class="flex items-center gap-2 mb-2">
+                            <i data-lucide="user" class="w-4 h-4 icon-themed"></i>
+                            <span class="text-[9px] font-black text-slate-300 uppercase">Presidente</span>
+                        </div>
+                        ${window.isEditing ? `<input list="hermanos" value="${row.p || ''}" onchange="updateVal(${i}, 'p', this.value)">` : `<div class="font-bold text-sm uppercase text-slate-700">${row.p || '-'}</div>`}
+                    </td>
+
+                    <td class="p-5 align-top bg-slate-50/20">
                         <div class="space-y-4">
                             <div>
                                 <div class="flex items-center gap-2 mb-1 text-slate-300">
-                                    <i data-lucide="users" class="w-4 h-4 icon-themed"></i>
                                     <i data-lucide="user" class="w-4 h-4 icon-themed"></i>
                                     <span class="text-[9px] font-black uppercase">Orador Visitante</span>
                                 </div>
@@ -195,7 +302,7 @@
                     nextTheme = window.appData[nextMonthName][0].t || "Pendiente asignar";
                 }
             }
-
+            
             const text = `*RECORDATORIO REUNIÓN FIN DE SEMANA* 🗓️\nFecha: ${row.d} de ${window.currentMonth}\n\n*Presidente:* ${row.p || '-'}\n*Discursante:* ${row.o || '-'}\n*Tema:* _"${row.t || '-'}"_\n*Lector de la Atalaya:* ${row.l || '-'}\n\n📌 *Próximo Discurso Público:* _"${nextTheme}"_`;
             showModal(text);
         };
