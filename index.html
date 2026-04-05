@@ -46,25 +46,27 @@
     <script src="https://unpkg.com/lucide@latest"></script>
     
     <style>
-        @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;600;800&display=swap');
-        body { font-family: 'Plus Jakarta Sans', sans-serif; background: #f1f5f9; color: #1e293b; -webkit-tap-highlight-color: transparent; }
-        
-        /* Temas Dinámicos */
-        .theme-Abril { --accent: #4338ca; --accent-light: #e0e7ff; }
-        .theme-Mayo { --accent: #047857; --accent-light: #d1fae5; }
-        .theme-Junio { --accent: #b45309; --accent-light: #fef3c7; }
-        .theme-Julio { --accent: #db2777; --accent-light: #fce7f3; }
-        .theme-Agosto { --accent: #ca8a04; --accent-light: #fef9c3; }
-        .theme-Septiembre { --accent: #0369a1; --accent-light: #e0f2fe; }
-        .theme-Octubre { --accent: #9333ea; --accent-light: #f3e8ff; }
-        .theme-Noviembre { --accent: #c2410c; --accent-light: #ffedd5; }
-        .theme-Diciembre { --accent: #475569; --accent-light: #f1f5f9; }
+    @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;600;800&display=swap');
+    body { font-family: 'Plus Jakarta Sans', sans-serif; background: #f1f5f9; color: #1e293b; -webkit-tap-highlight-color: transparent; }
+    
+    /* Temas Dinámicos */
+    .theme-Abril { --accent: #4338ca; --accent-light: #e0e7ff; }
+    .theme-Mayo { --accent: #047857; --accent-light: #d1fae5; }
+    .theme-Junio { --accent: #b45309; --accent-light: #fef3c7; }
+    .theme-Julio { --accent: #db2777; --accent-light: #fce7f3; }
+    .theme-Agosto { --accent: #ca8a04; --accent-light: #fef9c3; }
+    .theme-Septiembre { --accent: #0369a1; --accent-light: #e0f2fe; }
+    .theme-Octubre { --accent: #9333ea; --accent-light: #f3e8ff; }
+    .theme-Noviembre { --accent: #c2410c; --accent-light: #ffedd5; }
+    .theme-Diciembre { --accent: #1e4883; --accent-light: #9ac9f8; }
 
-        .accent-text { color: var(--accent); }
-        .accent-bg { background-color: var(--accent); }
-        .accent-light-bg { background-color: var(--accent-light); }
-        .icon-themed { color: var(--accent); }
+    .accent-text { color: var(--accent); }
+    .accent-bg { background-color: var(--accent); }
+    .accent-light-bg { background-color: var(--accent-light); }
+    .icon-themed { color: var(--accent); }
 
+    input, select { background: transparent; border-bottom: 1px solid #e2e8f0; width: 100%; outline: none; font-size: 0.8rem; }
+    
         /* Estilos de Input */
         input, select { 
             background: transparent; 
@@ -77,17 +79,18 @@
         input:focus { border-bottom-color: var(--accent); }
 
         /* Tablet & Mobile Optimization */
-        @media (max-width: 1024px) {
-            .table-container { overflow-x: auto; -webkit-overflow-scrolling: touch; }
-            table { min-width: 900px; }
-            .p-5 { padding: 1rem !important; }
-        }
+       @media (max-width: 1024px) {
+        .table-container { overflow-x: auto; -webkit-overflow-scrolling: touch; }
+        table { min-width: 1000px; table-layout: fixed; }
+        header { padding: 1.5rem !important; }
+    }
 
-        @media print {
-            @page { size: landscape; margin: 0.5cm; }
-            .no-print { display: none !important; }
-            body { background: white; padding: 0; }
-            .print-container { box-shadow: none; border: none; width: 100%; max-width: 100%; }
+@media print {
+@media print {
+        @page { size: letter landscape; margin: 0.3cm; }
+        body { background: white; padding: 0 !important; margin: 0 !important; }
+        .no-print, #status, #edit-btn, nav { display: none !important; }
+        .print-container { box-shadow: none !important; border: none !important; width: 100% !important; max-width: 100% !important; margin: 0 !important; }
         }
     </style>
 </head>
