@@ -71,7 +71,7 @@
             border-bottom: 1px solid #e2e8f0; 
             width: 100%; 
             outline: none; 
-            font-size: 0.8rem;
+            font-size: 1.2rem; /* Agrandado 50% de 0.8rem */
             padding: 2px 0;
         }
         input:focus { border-bottom-color: var(--accent); }
@@ -97,13 +97,14 @@
         <header class="p-6 md:p-10 accent-light-bg transition-colors">
             <div class="flex flex-col md:flex-row justify-between items-center gap-4 text-center md:text-left">
                 <div>
-                    <h1 class="text-3xl md:text-5xl font-extrabold italic text-slate-700 tracking-tighter">PROGRAMA <span class="accent-text">2026</span></h1>
-                    <p class="text-slate-600 font-bold text-xs md:text-sm mt-1 uppercase tracking-widest">Reunión Fin de Semana – Ypacaraí</p>
-                    <div id="status" class="inline-block mt-2 px-3 py-1 bg-white rounded-full text-[9px] font-black text-green-500 shadow-sm uppercase tracking-tighter">Conectando...</div>
+                    <!-- Título reducido 50% de text-3xl/5xl a text-base/2xl -->
+                    <h1 class="text-base md:text-2xl font-extrabold italic text-slate-700 tracking-tighter">PROGRAMA <span class="accent-text">2026</span></h1>
+                    <p class="text-slate-600 font-bold text-[18px] md:text-[21px] mt-1 uppercase tracking-widest">Reunión Fin de Semana – Ypacaraí</p>
+                    <div id="status" class="inline-block mt-2 px-3 py-1 bg-white rounded-full text-[13.5px] font-black text-green-500 shadow-sm uppercase tracking-tighter">Conectando...</div>
                 </div>
                 <div class="flex gap-2 no-print">
                     <button onclick="window.print()" class="p-3 bg-white rounded-2xl border border-slate-200 shadow-sm hover:bg-slate-50 transition-all"><i data-lucide="printer" class="w-5 h-5 text-slate-400"></i></button>
-                    <button id="edit-btn" onclick="toggleEdit()" class="px-8 py-3 bg-slate-900 text-white rounded-2xl font-black text-sm hover:scale-105 active:scale-95 transition-all shadow-lg">EDITAR</button>
+                    <button id="edit-btn" onclick="toggleEdit()" class="px-8 py-3 bg-slate-900 text-white rounded-2xl font-black text-[21px] hover:scale-105 active:scale-95 transition-all shadow-lg">EDITAR</button>
                 </div>
             </div>
         </header>
@@ -113,7 +114,7 @@
         <div class="table-container">
             <table class="w-full text-left border-collapse">
                 <thead>
-                    <tr class="text-[10px] md:text-[11px] font-black uppercase text-slate-400 bg-slate-50/80 border-b border-slate-100">
+                    <tr class="text-[15px] md:text-[16.5px] font-black uppercase text-slate-400 bg-slate-50/80 border-b border-slate-100">
                         <th class="p-5 text-center w-24">Fecha</th>
                         <th class="p-5">Presidente</th>
                         <th class="p-5">Discurso Público (Visita)</th>
@@ -126,6 +127,7 @@
         </div>
     </div>
 
+    <!-- VENTANA DE RECORDATORIO (Sin cambios en estilos de texto según instrucción) -->
     <div id="modal" class="hidden fixed inset-0 bg-slate-900/80 backdrop-blur-md z-50 items-center justify-center p-4 no-print">
         <div class="bg-white w-full max-w-md rounded-[2.5rem] p-8 shadow-2xl animate-in zoom-in duration-200">
             <div class="flex justify-between items-center mb-6">
@@ -186,7 +188,8 @@
         window.renderApp = function() {
             document.getElementById('theme-root').className = `p-2 md:p-6 theme-${window.currentMonth}`;
             const tabs = document.getElementById('month-tabs');
-            tabs.innerHTML = months.map(m => `<button onclick="setMonth('${m}')" class="px-6 py-2 rounded-xl text-[10px] font-black uppercase whitespace-nowrap transition-all ${window.currentMonth === m ? 'bg-white shadow-md accent-text scale-105' : 'text-slate-400 hover:text-slate-600'}">${m}</button>`).join('');
+            // Botones de meses: text-[10px] -> text-[15px]
+            tabs.innerHTML = months.map(m => `<button onclick="setMonth('${m}')" class="px-6 py-2 rounded-xl text-[15px] font-black uppercase whitespace-nowrap transition-all ${window.currentMonth === m ? 'bg-white shadow-md accent-text scale-105' : 'text-slate-400 hover:text-slate-600'}">${m}</button>`).join('');
 
             const body = document.getElementById('table-body');
             body.innerHTML = (window.appData[window.currentMonth] || []).map((row, i) => {
@@ -194,22 +197,26 @@
                 return `
                 <tr class="border-b border-slate-50 hover:bg-slate-50/50 transition-colors">
                     <td class="p-5 text-center border-r border-slate-100 align-top">
-                        <div class="text-3xl font-black accent-text leading-none">${row.d || '00'}</div>
-                        <div class="text-[9px] font-bold text-slate-400 uppercase tracking-tighter mt-1">${window.currentMonth}</div>
+                        <!-- Fecha: text-3xl -> text-[45px] -->
+                        <div class="text-[45px] font-black accent-text leading-none">${row.d || '00'}</div>
+                        <!-- Mes: text-[9px] -> text-[13.5px] -->
+                        <div class="text-[13.5px] font-bold text-slate-400 uppercase tracking-tighter mt-1">${window.currentMonth}</div>
                         <button onclick="openLocalModal(${i})" class="mt-4 p-2 bg-white border border-slate-200 rounded-xl text-slate-300 hover:accent-text hover:border-indigo-100 shadow-sm transition-all no-print"><i data-lucide="bell" class="w-4 h-4"></i></button>
-                        ${window.isEditing ? `<input class="mt-2 text-[8px] text-center" placeholder="Evento Especial?" value="${row.ev || ''}" onchange="updateVal(${i}, 'ev', this.value)">` : ''}
+                        ${window.isEditing ? `<input class="mt-2 text-[12px] text-center" placeholder="Evento Especial?" value="${row.ev || ''}" onchange="updateVal(${i}, 'ev', this.value)">` : ''}
                     </td>
 
                     ${isSpecial ? `
                     <td colspan="4" class="p-10 text-center bg-slate-50/30">
-                        <div class="text-[28px] font-black italic uppercase accent-text tracking-[0.2em] opacity-80">${row.ev}</div>
+                        <!-- Especial: text-[28px] -> text-[42px] -->
+                        <div class="text-[42px] font-black italic uppercase accent-text tracking-[0.2em] opacity-80">${row.ev}</div>
                     </td>` : `
                     <td class="p-5 align-top">
                         <div class="flex items-center gap-2 mb-2">
                             <i data-lucide="user" class="w-4 h-4 icon-themed"></i>
-                            <span class="text-[9px] font-black text-slate-300 uppercase">Presidente</span>
+                            <span class="text-[13.5px] font-black text-slate-300 uppercase">Presidente</span>
                         </div>
-                        ${window.isEditing ? `<input list="hermanos" value="${row.p || ''}" onchange="updateVal(${i}, 'p', this.value)">` : `<div class="font-bold text-sm uppercase text-slate-700">${row.p || '-'}</div>`}
+                        <!-- Presidente: text-sm -> text-[21px] -->
+                        ${window.isEditing ? `<input list="hermanos" class="text-[21px]" value="${row.p || ''}" onchange="updateVal(${i}, 'p', this.value)">` : `<div class="font-bold text-[21px] uppercase text-slate-700">${row.p || '-'}</div>`}
                     </td>
 
                     <td class="p-5 align-top bg-slate-50/20">
@@ -217,23 +224,25 @@
                             <div>
                                 <div class="flex items-center gap-2 mb-1 text-slate-300">
                                     <i data-lucide="user" class="w-4 h-4 icon-themed"></i>
-                                    <span class="text-[9px] font-black uppercase">Orador Visitante</span>
+                                    <span class="text-[13.5px] font-black uppercase">Orador Visitante</span>
                                 </div>
-                                ${window.isEditing ? `<input value="${row.o || ''}" onchange="updateVal(${i}, 'o', this.value)">` : `<div class="font-bold text-sm text-slate-800 uppercase">${row.o || '-'}</div>`}
+                                ${window.isEditing ? `<input class="text-[21px]" value="${row.o || ''}" onchange="updateVal(${i}, 'o', this.value)">` : `<div class="font-bold text-[21px] text-slate-800 uppercase">${row.o || '-'}</div>`}
                             </div>
                             <div>
                                 <div class="flex items-center gap-2 mb-1 text-slate-300">
                                     <i data-lucide="book-open" class="w-4 h-4 icon-themed"></i>
-                                    <span class="text-[9px] font-black uppercase">Tema</span>
+                                    <span class="text-[13.5px] font-black uppercase">Tema</span>
                                 </div>
-                                ${window.isEditing ? `<input value="${row.t || ''}" placeholder="Título del discurso..." onchange="updateVal(${i}, 't', this.value)">` : `<div class="text-[11px] font-medium text-slate-500 italic leading-snug">"${row.t || '-'}"</div>`}
+                                <!-- Tema: text-[11px] -> text-[16.5px] -->
+                                ${window.isEditing ? `<input class="text-[16.5px]" value="${row.t || ''}" placeholder="Título del discurso..." onchange="updateVal(${i}, 't', this.value)">` : `<div class="text-[16.5px] font-medium text-slate-500 italic leading-snug">"${row.t || '-'}"</div>`}
                             </div>
                             <div>
                                 <div class="flex items-center gap-2 mb-1 text-slate-300">
                                     <i data-lucide="map-pin" class="w-4 h-4 icon-themed"></i>
-                                    <span class="text-[9px] font-black uppercase">Congregación que visita</span>
+                                    <span class="text-[13.5px] font-black uppercase">Congregación que visita</span>
                                 </div>
-                                ${window.isEditing ? `<input value="${row.cv || ''}" onchange="updateVal(${i}, 'cv', this.value)">` : `<div class="text-[10px] font-black text-slate-400 uppercase tracking-tighter">${row.cv || '-'}</div>`}
+                                <!-- Congregación: text-[10px] -> text-[15px] -->
+                                ${window.isEditing ? `<input class="text-[15px]" value="${row.cv || ''}" onchange="updateVal(${i}, 'cv', this.value)">` : `<div class="text-[15px] font-black text-slate-400 uppercase tracking-tighter">${row.cv || '-'}</div>`}
                             </div>
                         </div>
                     </td>
@@ -241,9 +250,9 @@
                     <td class="p-5 align-top">
                         <div class="flex items-center gap-2 mb-2">
                             <i data-lucide="user-check" class="w-4 h-4 icon-themed"></i>
-                            <span class="text-[9px] font-black text-slate-300 uppercase">Lector Atalaya</span>
+                            <span class="text-[13.5px] font-black text-slate-300 uppercase">Lector Atalaya</span>
                         </div>
-                        ${window.isEditing ? `<input list="hermanos" value="${row.l || ''}" onchange="updateVal(${i}, 'l', this.value)">` : `<div class="font-bold text-sm uppercase text-slate-700">${row.l || '-'}</div>`}
+                        ${window.isEditing ? `<input list="hermanos" class="text-[21px]" value="${row.l || ''}" onchange="updateVal(${i}, 'l', this.value)">` : `<div class="font-bold text-[21px] uppercase text-slate-700">${row.l || '-'}</div>`}
                     </td>
 
                     <td class="p-5 align-top border-l border-slate-100">
@@ -251,30 +260,30 @@
                             <div>
                                 <div class="flex items-center gap-2 mb-1 text-slate-300">
                                     <i data-lucide="plane-takeoff" class="w-4 h-4 icon-themed"></i>
-                                    <span class="text-[9px] font-black uppercase">Orador de Salida</span>
+                                    <span class="text-[13.5px] font-black uppercase">Orador de Salida</span>
                                 </div>
-                                ${window.isEditing ? `<input list="hermanos" value="${row.s || ''}" onchange="updateVal(${i}, 's', this.value)">` : `<div class="font-bold text-sm text-slate-800 uppercase">${row.s || '-'}</div>`}
+                                ${window.isEditing ? `<input list="hermanos" class="text-[21px]" value="${row.s || ''}" onchange="updateVal(${i}, 's', this.value)">` : `<div class="font-bold text-[21px] text-slate-800 uppercase">${row.s || '-'}</div>`}
                             </div>
                             <div>
                                 <div class="flex items-center gap-2 mb-1 text-slate-300">
                                     <i data-lucide="book-open" class="w-4 h-4 icon-themed"></i>
-                                    <span class="text-[9px] font-black uppercase">Tema</span>
+                                    <span class="text-[13.5px] font-black uppercase">Tema</span>
                                 </div>
-                                ${window.isEditing ? `<input value="${row.st || ''}" placeholder="Tema de salida..." onchange="updateVal(${i}, 'st', this.value)">` : `<div class="text-[11px] font-medium text-slate-500 italic">"${row.st || '-'}"</div>`}
+                                ${window.isEditing ? `<input class="text-[16.5px]" value="${row.st || ''}" placeholder="Tema de salida..." onchange="updateVal(${i}, 'st', this.value)">` : `<div class="text-[16.5px] font-medium text-slate-500 italic">"${row.st || '-'}"</div>`}
                             </div>
                             
                             <div class="pt-3 border-t border-slate-100">
                                 <div class="flex justify-between items-center mb-2">
                                     <div class="flex items-center gap-1">
-                                        <span class="text-[8px] font-black text-slate-300 uppercase">Congregación</span>
+                                        <span class="text-[12px] font-black text-slate-300 uppercase">Congregación</span>
                                         <button onclick="openSalidaModal(${i})" class="ml-1 p-1 text-slate-300 hover:accent-text no-print"><i data-lucide="bell-ring" class="w-3 h-3"></i></button>
                                     </div>
-                                    <div class="text-[8px] font-black text-slate-300 uppercase">Día / Hora</div>
+                                    <div class="text-[12px] font-black text-slate-300 uppercase">Día / Hora</div>
                                 </div>
                                 <div class="flex gap-2">
-                                    <div class="flex-1">${window.isEditing ? `<input value="${row.sd || ''}" onchange="updateVal(${i}, 'sd', this.value)">` : `<div class="font-bold text-[11px] uppercase">${row.sd || '-'}</div>`}</div>
-                                    <div class="w-20">${window.isEditing ? `<select onchange="updateVal(${i}, 'shd', this.value)"><option value="Sábado" ${row.shd=='Sábado'?'selected':''}>Sábado</option><option value="Domingo" ${row.shd=='Domingo'?'selected':''}>Domingo</option></select>` : `<div class="text-[10px] font-black accent-text uppercase">${row.shd || '-'}</div>`}</div>
-                                    <div class="w-16">${window.isEditing ? `<input type="time" value="${row.shh || ''}" onchange="updateVal(${i}, 'shh', this.value)">` : `<div class="text-[10px] font-black text-slate-400 uppercase">${row.shh || '-'}</div>`}</div>
+                                    <div class="flex-1">${window.isEditing ? `<input class="text-[16.5px]" value="${row.sd || ''}" onchange="updateVal(${i}, 'sd', this.value)">` : `<div class="font-bold text-[16.5px] uppercase">${row.sd || '-'}</div>`}</div>
+                                    <div class="w-20">${window.isEditing ? `<select class="text-[15px]" onchange="updateVal(${i}, 'shd', this.value)"><option value="Sábado" ${row.shd=='Sábado'?'selected':''}>Sábado</option><option value="Domingo" ${row.shd=='Domingo'?'selected':''}>Domingo</option></select>` : `<div class="text-[15px] font-black accent-text uppercase">${row.shd || '-'}</div>`}</div>
+                                    <div class="w-16">${window.isEditing ? `<input class="text-[15px]" type="time" value="${row.shh || ''}" onchange="updateVal(${i}, 'shh', this.value)">` : `<div class="text-[15px] font-black text-slate-400 uppercase">${row.shh || '-'}</div>`}</div>
                                 </div>
                             </div>
                         </div>
@@ -282,7 +291,7 @@
                     `}
                 </tr>
                 `;
-            }).join('') || '<tr><td colspan="5" class="p-10 text-center text-slate-400 font-bold uppercase italic tracking-widest">No hay datos para este mes</td></tr>';
+            }).join('') || '<tr><td colspan="5" class="p-10 text-center text-slate-400 font-bold uppercase italic tracking-widest text-[18px]">No hay datos para este mes</td></tr>';
             lucide.createIcons();
         };
 
