@@ -82,12 +82,34 @@
             table { min-width: 1000px; }
             .p-5 { padding: 1rem !important; }
         }
-
         @media print {
             @page { size: landscape; margin: 0.5cm; }
             .no-print { display: none !important; }
-            body { background: white; padding: 0; }
-            .print-container { box-shadow: none; border: none; width: 100%; max-width: 100%; }
+            body { 
+                background: white !important; 
+                overflow: visible !important; 
+            }
+            .print-container { 
+                box-shadow: none !important; 
+                border: none !important; 
+                overflow: visible !important;
+                max-width: 100% !important;
+                display: block !important;
+            }
+            .table-container { 
+                overflow: visible !important; 
+                display: block !important;
+            }
+            table { 
+                page-break-inside: auto; 
+            }
+            tr { 
+                page-break-inside: avoid;
+                page-break-after: auto; 
+            }
+            thead { 
+                display: table-header-group;
+            }
         }
     </style>
 </head>
